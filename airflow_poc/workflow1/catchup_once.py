@@ -1,27 +1,26 @@
-import os
-
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.utils.dates import days_ago
-from sqlalchemy_utils.types.enriched_datetime.pendulum_datetime import pendulum
 
-DAG_ID = os.path.basename(__file__).replace(".py", "")
-KST = pendulum.timezone("Asia/Seoul")
+from airflow_poc.module.util import get_dag_and_tag_id
+
+DAG_ID, WORKFLOW_ID = get_dag_and_tag_id(__file__)
+
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
 }
 
-DAYS = 366
+DAYS = 14
 
 with DAG(
         dag_id=DAG_ID,
         default_args=default_args,
-        description='test hourly dags',
-        schedule_interval="@yearly",
+        description='test once dags',
+        schedule_interval="@once",
         start_date=days_ago(DAYS),
-        tags=['test'],
+        tags=[WORKFLOW_ID],
 ) as dag:
     start = DummyOperator(task_id="start")
 
